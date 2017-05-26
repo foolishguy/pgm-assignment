@@ -24,7 +24,10 @@ end
 
 % Your code here:
 %factors = allFactors; %%% REMOVE THIS LINE
-[factors, index] = sort([allFactors.val], 'descend');
+for i=1:length(allFactors),
+	val(i) = allFactors(i).val(1, 1);
+end
+[tmpVal, index] = sort(val, 'descend');
 factors = allFactors(index(1:F));
 
 end
