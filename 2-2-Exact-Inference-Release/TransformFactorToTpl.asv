@@ -1,0 +1,16 @@
+% a = struct('var', [7, 1], 'card', [2, 3], 'val', [0.8, 0.2, 0.6, 0.4, 0.1, 0.9])
+% b = struct('var', [1, 7], 'card', [3, 2], 'val', [])
+
+function ResFactor = TransformFactorToTpl(Factor, TplFactor)
+	varLen = length(Factor.var);
+	varMap = zeros(varLen, 1);
+	ResFactor = Factor;
+    ResFactor.var = TplFactor.var;
+	for i=1:varLen
+		varMap(i) = find(Factor.var == TplFactor.var(i));
+        ResFactor.card(i) = Factor.card(varMap(i));
+    end
+	assignments = IndexToAssignment(1:prod(ResFactor.card), ResFactor.card);
+    indxFactor = AssignmentToIndex(assignments(:, varMap), Factor.card);
+	ResFactor.val = Factor.val(indxFactor);
+end
