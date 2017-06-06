@@ -20,7 +20,8 @@
 %   See also FactorMarginalization.m, IndexToAssignment.m, and AssignmentToIndex.m
 %
 % Copyright (C) Daphne Koller, Stanford University, 2012
-
+% A = struct('var', [1, 2], 'card', [2, 2], 'val', [1, 2, 3, 4])  V = 1
+% B = struct('var', [2], 'card', [2], 'val', [3, 4])
 function B = FactorMaxMarginalization(A, V)
 
 % Check for empty factor or variable list
@@ -44,6 +45,12 @@ B.val = [];
 % YOUR CODE HERE
 % Correctly set up and populate the factor values of B
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+B.card = A.card(mapB);
+B.val = log(zeros(1, prod(B.card)));
+assignments = IndexToAssignment(1:prod(A.card), A.card);
+indxB = AssignmentToIndex(assignments(:, mapB), B.card);
+for i = 1:length(A.val),
+    B.val(indxB(i)) = max(B.val(indxB(i)), A.val(i));
+end;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 end

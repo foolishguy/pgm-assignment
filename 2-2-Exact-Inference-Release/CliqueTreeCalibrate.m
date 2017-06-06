@@ -38,17 +38,29 @@ MESSAGES = repmat(struct('var', [], 'card', [], 'val', []), N, N);
  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 i = 1;
 j = 1;
+if isMax
+    for k=1:N
+        P.cliqueList(k).val = log(P.cliqueList(k).val);
+    end
+end
 while i && j
 	[i, j] = GetNextCliques(P, MESSAGES);
     if i && j
     	tmpMsg = P.cliqueList(i);
     	indxList = setdiff(find(P.edges(:, i)), j);
-    	for indx=1:length(indxList)
-    		tmpMsg = FactorProduct(tmpMsg, MESSAGES(indxList(indx), i));
-    	end
         diff = setdiff(P.cliqueList(i).var, P.cliqueList(j).var);
-        MESSAGES(i, j) = FactorMarginalization(tmpMsg, diff);
-        MESSAGES(i, j).val = MESSAGES(i, j).val / sum(MESSAGES(i, j).val);
+        if isMax
+            for indx=1:length(indxList)
+                tmpMsg = FactorSum(tmpMsg, MESSAGES(indxList(indx), i));
+            end
+            MESSAGES(i, j) = FactorMaxMarginalization(tmpMsg, diff);         
+        else 
+            for indx=1:length(indxList)
+                tmpMsg = FactorProduct(tmpMsg, MESSAGES(indxList(indx), i));
+            end
+            MESSAGES(i, j) = FactorMarginalization(tmpMsg, diff);
+            MESSAGES(i, j).val = MESSAGES(i, j).val / sum(MESSAGES(i, j).val);            
+        end
     end
 end
 
@@ -62,7 +74,11 @@ end
 for i=1:N
 	indxList = find(P.edges(:, i));
 	for indx=indxList'
-		P.cliqueList(i) = FactorProduct(P.cliqueList(i), MESSAGES(indx, i));
+        if isMax
+            P.cliqueList(i) = FactorSum(P.cliqueList(i), MESSAGES(indx, i));
+        else
+            P.cliqueList(i) = FactorProduct(P.cliqueList(i), MESSAGES(indx, i));
+        end
 	end
 end
 

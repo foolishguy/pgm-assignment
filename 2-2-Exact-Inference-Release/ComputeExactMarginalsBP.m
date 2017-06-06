@@ -26,18 +26,18 @@ M = [];
 
 P = CreateCliqueTree(F, E);
 P = CliqueTreeCalibrate(P, isMax);
-varList = [];
-for i=1:length(P.cliqueList)
-	varList = unique([varList, P.cliqueList(i).var']);
-end
-M = repmat(struct('var', [], 'card', [], 'val', []), length(varList), 1);
+M = repmat(struct('var', [], 'card', [], 'val', []), size(P.edges, 1), 1);
 
 for i=1:length(P.cliqueList)
 	var = P.cliqueList(i).var;
 	for j=1:length(var)
 		diffVar = setdiff(var, var(j));
-		M(var(j)) = FactorMarginalization(P.cliqueList(i), diffVar);
-        M(var(j)).val = M(var(j)).val / sum(M(var(j)).val);
+		if isMax 
+			M(var(j)) = FactorMaxMarginalization(P.cliqueList(i), diffVar);
+		else 
+			M(var(j)) = FactorMarginalization(P.cliqueList(i), diffVar);
+            M(var(j)).val = M(var(j)).val / sum(M(var(j)).val);
+		end
 	end
 end
 
