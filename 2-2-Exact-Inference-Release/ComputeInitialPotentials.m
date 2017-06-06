@@ -40,22 +40,19 @@ P.edges = zeros(N);
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 P.edges = C.edges;
+flag = ones(1, length(C.factorList));
+
 for i=1:N
 	tmpFactor = struct('var', [], 'card', [], 'val', []);
-	isLeaf = sum(C.edges(i, :)) == 1;
-	node = C.nodes{i};
-	for j=1:length(C.factorList)
+	nodeI = C.nodes{i};
+	for j=find(flag)
 		factor = C.factorList(j);
-		[dummy, mapJ] = ismember(factor.var, node);
-		[dummy, mapZero] = ismember(0, mapJ);
-		if ~isLeaf && length(factor.var) == length(node) && mapZero == 0
-			tmpFactor = factor;
-		end
-		if isLeaf && mapZero == 0
+		if all(ismember(factor.var, nodeI))
+			flag(j) = 0;
 			tmpFactor = FactorProduct(tmpFactor, factor);
 		end
 	end
-	P.cliqueList(i).var = node;
+	P.cliqueList(i).var = nodeI;
 	P.cliqueList(i) = TransformFactorToTpl(tmpFactor, P.cliqueList(i));
 end
 
